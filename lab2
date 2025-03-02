@@ -1,5 +1,6 @@
-index.php
-```
+`index.php`:
+
+```php
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -49,9 +50,9 @@ index.php
             </td>
         </tr>
     </table>
-```
 
     <h2>Результаты циклов</h2>
     <?php include 'index1.php'; ?>
 </body>
 </html>
+```
