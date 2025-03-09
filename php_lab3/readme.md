@@ -36,6 +36,7 @@
 Этот файл является основным и отвечает за отображение как таблицы с транзакциями, так и галереи изображений. В нем подключены другие необходимые файлы и стили.
 
 ```php
+
 <?php
 declare(strict_types=1);
 require 'transactions.php';
@@ -84,6 +85,7 @@ require 'transactions.php';
 
 </body>
 </html>
+
 ```
 
 #### transactions.php
