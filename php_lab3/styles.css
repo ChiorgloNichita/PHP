@@ -1,3 +1,30 @@
+/* Стиль для навигационного меню */
+.navbar {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 20px; /* Отступ сверху, чтобы не касалось таблицы */
+    margin-bottom: 20px; /* Отступ снизу для разделения с галереей */
+}
+
+.navbar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 5px 15px;
+    transition: background-color 0.3s;
+}
+
+.navbar a:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+/* Стиль для таблицы транзакций */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -9,15 +36,26 @@ th, td {
     text-align: center;
 }
 
+/* Стиль для галереи изображений */
 .gallery {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
 }
 
 .gallery-img {
-    width: 150px;
-    height: auto;
+    width: 150px;  /* Фиксированный размер ширины */
+    height: 150px; /* Фиксированный размер высоты */
+    object-fit: cover; /* Изображения обрезаются, чтобы соответствовать размеру */
     border: 2px solid #ddd;
     border-radius: 5px;
+}
+
+/* Подвал */
+p {
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
 }

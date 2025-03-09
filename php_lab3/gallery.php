@@ -1,5 +1,5 @@
 <?php
-$dir = 'image/';
+$dir = 'image/'; 
 $files = scandir($dir);
 ?>
 
@@ -10,3 +10,4 @@ $files = scandir($dir);
         <?php endif; ?>
     <?php endforeach; ?>
 </div>
+<p style="text-align:center; margin-top: 20px;">USM @ 2025</p>

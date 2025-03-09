@@ -30,7 +30,7 @@ require 'transactions.php';
             <tr>
                 <td><?= $transaction['id'] ?></td>
                 <td><?= $transaction['date'] ?></td>
-                <td><?= $transaction['amount'] ?> ₽</td>
+                <td><?= $transaction['amount'] ?> $</td>
                 <td><?= $transaction['description'] ?></td>
                 <td><?= $transaction['merchant'] ?></td>
                 <td><?= daysSinceTransaction($transaction['date']) ?></td>
@@ -39,9 +39,16 @@ require 'transactions.php';
     </tbody>
 </table>
 
-<p><strong>Общая сумма всех транзакций: </strong><?= calculateTotalAmount($transactions) ?> ₽</p>
+<p><strong>Общая сумма всех транзакций: </strong><?= calculateTotalAmount($transactions) ?> $</p>
 
+<!-- Меню, теперь оно будет отображаться только над галереей -->
 <h2>Галерея изображений</h2>
+<div class="navbar">
+    <a href="#">Abouts casts</a>
+    <a href="#">News</a>
+    <a href="#">Contacts</a>
+</div>
+
 <?php require 'gallery.php'; ?>
 
 </body>

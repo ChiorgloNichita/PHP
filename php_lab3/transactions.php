@@ -2,8 +2,20 @@
 declare(strict_types=1);
 
 $transactions = [
-    ["id" => 1, "date" => "2019-01-01", "amount" => 100.00, "description" => "Payment for groceries", "merchant" => "SuperMart"],
-    ["id" => 2, "date" => "2020-02-15", "amount" => 75.50, "description" => "Dinner with friends", "merchant" => "Local Restaurant"],
+    [
+        "id" => 1,
+        "date" => "2019-01-01",
+        "amount" => 100.00,
+        "description" => "Payment for groceries",
+        "merchant" => "SuperMart",
+    ],
+    [
+        "id" => 2,
+        "date" => "2020-02-15",
+        "amount" => 75.50,
+        "description" => "Dinner with friends",
+        "merchant" => "Local Restaurant",
+    ],
 ];
 
 // Функция вычисления общей суммы
@@ -24,6 +36,7 @@ function findTransactionByDescription(array $transactions, string $descriptionPa
 
 // Функция поиска транзакции по ID
 function findTransactionById(array $transactions, int $id): ?array {
+    global $transactions;  // Используем глобальную переменную $transactions
     foreach ($transactions as $transaction) {
         if ($transaction['id'] === $id) {
             return $transaction;
@@ -34,17 +47,19 @@ function findTransactionById(array $transactions, int $id): ?array {
 
 // Функция добавления транзакции
 function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
-    global $transactions;
+    global $transactions;  // Используем глобальную переменную $transactions
     $transactions[] = compact("id", "date", "amount", "description", "merchant");
 }
 
 // Функция сортировки по дате
 function sortTransactionsByDate(array &$transactions): void {
+    global $transactions;  // Используем глобальную переменную $transactions
     usort($transactions, fn($a, $b) => strcmp($a['date'], $b['date']));
 }
 
 // Функция сортировки по сумме (по убыванию)
 function sortTransactionsByAmount(array &$transactions): void {
+    global $transactions;  // Используем глобальную переменную $transactions
     usort($transactions, fn($a, $b) => $b['amount'] <=> $a['amount']);
 }
 
