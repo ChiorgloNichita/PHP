@@ -1,0 +1,226 @@
+/**
+ * Основной стиль для тела документа
+ * 
+ * @property string font-family Устанавливает шрифт для текста.
+ * @property string background-color Устанавливает цвет фона страницы.
+ * @property string padding Устанавливает внутренний отступ для всего тела документа.
+ * @property string max-width Устанавливает максимальную ширину страницы.
+ * @property string margin Устанавливает автоматическое выравнивание и отступы.
+ */
+ body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+/**
+ * Стиль для заголовка h2
+ * 
+ * @property string text-align Выравнивание текста по центру.
+ * @property string color Устанавливает цвет текста.
+ */
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+/**
+ * Общий стиль для формы, блока результатов и таблицы
+ * 
+ * @property string background Устанавливает белый фон для блоков.
+ * @property string padding Добавляет внутренние отступы.
+ * @property string border-radius Добавляет скругление углов.
+ * @property string box-shadow Добавляет тень для элемента.
+ */
+form, .result-box, table {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/**
+ * Стиль для формы
+ * 
+ * @property string max-width Устанавливает максимальную ширину формы.
+ * @property string margin Выравнивание формы по центру страницы.
+ */
+form {
+    max-width: 600px;
+    margin: auto;
+}
+
+/**
+ * Стиль для меток и абзацев
+ * 
+ * @property string font-size Устанавливает размер шрифта.
+ * @property string font-weight Устанавливает толщину шрифта.
+ * @property string margin-bottom Устанавливает отступ снизу.
+ */
+label, p {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/**
+ * Стиль для поля ввода текста
+ * 
+ * @property string width Устанавливает ширину поля ввода.
+ * @property string padding Устанавливает внутренний отступ.
+ * @property string margin-bottom Устанавливает отступ снизу.
+ * @property string border Устанавливает рамку для поля ввода.
+ * @property string border-radius Устанавливает скругленные углы для поля ввода.
+ */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/**
+ * Стиль для радиокнопок и чекбоксов
+ * 
+ * @property string margin-right Добавляет отступ справа от элементов.
+ */
+input[type="radio"], input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/**
+ * Стиль для кнопок
+ * 
+ * @property string width Устанавливает ширину кнопки.
+ * @property string padding Устанавливает отступы внутри кнопки.
+ * @property string background-color Устанавливает цвет фона кнопки.
+ * @property string color Устанавливает цвет текста на кнопке.
+ * @property string border Убирает рамку вокруг кнопки.
+ * @property string border-radius Добавляет скругленные углы кнопке.
+ * @property string font-size Устанавливает размер шрифта в кнопке.
+ * @property string cursor Устанавливает тип курсора при наведении на кнопку.
+ */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/**
+ * Стиль для кнопки при наведении
+ * 
+ * @property string background-color Изменяет цвет фона кнопки при наведении.
+ */
+button:hover {
+    background-color: #218838;
+}
+
+/**
+ * Стиль для блока с результатами
+ * 
+ * @property string text-align Выравнивание текста по центру.
+ */
+.result-box {
+    text-align: center;
+}
+
+/**
+ * Стиль для текста в блоке с результатами
+ * 
+ * @property string font-size Устанавливает размер шрифта.
+ * @property string font-weight Устанавливает толщину шрифта.
+ */
+.result-text {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/**
+ * Стиль для таблицы
+ * 
+ * @property string width Устанавливает ширину таблицы.
+ * @property string border-collapse Убирает двойные границы в таблице.
+ * @property string background Устанавливает белый фон для таблицы.
+ * @property string border-radius Добавляет скругление углов таблицы.
+ * @property string overflow Устанавливает скрытие переполнения в таблице.
+ * @property string box-shadow Добавляет тень для таблицы.
+ */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/**
+ * Стиль для ячеек таблицы
+ * 
+ * @property string padding Устанавливает внутренние отступы.
+ * @property string text-align Выравнивание текста в ячейке.
+ * @property string border-bottom Добавляет разделительную линию для строк таблицы.
+ */
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/**
+ * Стиль для заголовков таблицы
+ * 
+ * @property string background-color Устанавливает фоновый цвет для заголовков.
+ * @property string color Устанавливает цвет текста для заголовков.
+ */
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+/**
+ * Стиль для четных строк таблицы
+ * 
+ * @property string background-color Устанавливает фоновый цвет для четных строк.
+ */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/**
+ * Стиль для ссылки, которая выглядит как кнопка
+ * 
+ * @property string display Устанавливает отображение как встроенный блок.
+ * @property string padding Устанавливает отступы для ссылки.
+ * @property string margin-top Добавляет верхний отступ для ссылки.
+ * @property string text-decoration Убирает подчеркивание у ссылки.
+ * @property string background-color Устанавливает фоновый цвет для ссылки.
+ * @property string color Устанавливает цвет текста ссылки.
+ * @property string border-radius Добавляет скругление углов.
+ */
+.button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-top: 15px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+
+/**
+ * Стиль для ссылки при наведении
+ * 
+ * @property string background-color Изменяет цвет фона при наведении на ссылку.
+ */
+.button:hover {
+    background-color: #0056b3;
+}
