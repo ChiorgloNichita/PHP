@@ -778,7 +778,7 @@ tr:nth-child(even) {
 .button:hover {
     background-color: #0056b3;
 }
-
+```
 ---
 
 ### Требования
