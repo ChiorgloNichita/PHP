@@ -3,7 +3,7 @@
  * Подключаем файл для обработки теста.
  * В этом файле содержится логика обработки ответов пользователя и вычисления результатов.
  */
-include 'process_test.php'; // Подключаем логику из process_test.php
+require_once 'process_test.php'; // Подключаем логику из process_test.php
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +32,7 @@ include 'process_test.php'; // Подключаем логику из process_te
         // Пропускаем вопросы, у которых нет текста или ответов
         if (empty($q["question"]) || empty($q["answers"])) continue;
     ?>
-        <p><?php echo ($index + 1) . ". " .($q["question"]); ?></p>
+        <p><?php echo ($index + 1) . ". " .htmlspecialchars($q["question"]); ?></p>
         
         <?php 
         /**
@@ -40,7 +40,7 @@ include 'process_test.php'; // Подключаем логику из process_te
          * В зависимости от типа ответа (radio или checkbox) создается соответствующий HTML-элемент.
          */
         foreach ($q["answers"] as $key => $answer): 
-            $inputType = $q["type"];  // Тип элемента (radio или checkbox)
+            $inputType = htmlspecialchars($q["type"]);  // Тип элемента (radio или checkbox)
             $inputName = "answer[$index]"; // Имя для передачи данных в POST
 
             /**
@@ -48,12 +48,12 @@ include 'process_test.php'; // Подключаем логику из process_te
              * чтобы можно было передавать массив выбранных значений.
              */
             if ($inputType == 'checkbox') {
-                $inputName .= '[]';  
+                $inputName .= '[]';
             }
         ?>
             <!-- Генерируем поле ввода для ответа -->
             <input type="<?= $inputType ?>" name="<?= $inputName ?>" value="<?= $key ?>"> 
-            <?=($answer) ?><br>
+            <?=htmlspecialchars($answer) ?><br>
         <?php endforeach; ?>
         <br>
     <?php endforeach; ?>

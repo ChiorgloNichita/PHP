@@ -72,6 +72,26 @@
             "username": "Artiom",
             "correct": 2,
             "score": 40
+        },
+        {
+            "username": "Nikitaa",
+            "correct": 5,
+            "score": 100
+        },
+        {
+            "username": "\u041d\u0438\u043a\u0438\u0442\u0430",
+            "correct": 1,
+            "score": 20
+        },
+        {
+            "username": "\u0430\u043c\u0430\u043c",
+            "correct": 1,
+            "score": 20
+        },
+        {
+            "username": "\u041d\u0438\u043a\u0438\u0442\u0430",
+            "correct": 2,
+            "score": 40
         }
     ]
 }

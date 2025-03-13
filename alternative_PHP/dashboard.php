@@ -61,9 +61,9 @@ $results = isset($data["results"]) ? $data["results"] : []; // Проверка 
         <?php foreach ($results as $result): ?>
             <tr>
                 <!-- Вывод данных о пользователе -->
-                <td><?=($result["username"]) ?></td>
-                <td><?=($result["correct"]) ?></td>
-                <td><?=($result["score"]) ?>%</td>
+                <td><?=htmlspecialchars($result["username"]) ?></td>
+                <td><?=htmlspecialchars($result["correct"]) ?></td>
+                <td><?=htmlspecialchars($result["score"]) ?>%</td>
             </tr>
         <?php endforeach; ?>
     </tbody>

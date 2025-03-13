@@ -106,4 +106,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     header("Location: result.php?correct=$correctCount&score=$score");
     exit;
 }
-?>
