@@ -29,6 +29,7 @@ $score = isset($_GET["score"]) ? (float)$_GET["score"] : 0;
     </p>
     <a href="test.php" class="button">Пройти тест заново</a>
     <a href="dashboard.php" class="button">Посмотреть таблицу результатов</a>
+    <a href="index.php" class="button">Вернуться на главную</a>
 </div>
 
 </body>

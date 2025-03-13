@@ -64,9 +64,14 @@
     ],
     "results": [
         {
-            "username": "\u0432\u0432",
-            "correct": 0,
-            "score": 0
+            "username": "Nichita",
+            "correct": 4,
+            "score": 80
+        },
+        {
+            "username": "Artiom",
+            "correct": 2,
+            "score": 40
         }
     ]
 }

@@ -1,10 +1,7 @@
 <?php
 /**
- * Подключение логики теста.
- * Этот файл подключает файл с логикой обработки теста и отображает форму для прохождения теста.
- * 
- * @file test.php
- * @see process_test.php Файл, в котором реализована логика обработки теста.
+ * Подключаем файл для обработки теста.
+ * В этом файле содержится логика обработки ответов пользователя и вычисления результатов.
  */
 include 'process_test.php'; // Подключаем логику из process_test.php
 ?>
@@ -16,9 +13,6 @@ include 'process_test.php'; // Подключаем логику из process_te
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Прохождение футбольного теста</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        /* Стили остаются прежними */
-    </style>
 </head>
 <body>
 
@@ -26,45 +20,47 @@ include 'process_test.php'; // Подключаем логику из process_te
 
 <!-- Форма для прохождения теста -->
 <form action="test.php" method="POST">
-    <label for="username">Введите ваше имя:</label>
-    <input type="text" name="username" id="username" required>
+    <label>Введите ваше имя:</label>
+    <input type="text" name="username" required>
 
-<?php
-/**
- * Проходим по массиву вопросов и отображаем их.
- * Для каждого вопроса отображаются возможные варианты ответа.
- *
- * @var array $questions Массив вопросов для теста.
- * @var array $q Вопрос с возможными ответами.
- */
-foreach ($questions as $index => $q):
-    // Пропускаем пустые вопросы
-    if (empty($q["question"]) || empty($q["answers"])) continue;
-?>
-    <p><?= ($index + 1) . ". " . $q["question"] ?></p>
-
-<?php
+    <?php 
     /**
-     * Отображаем варианты ответов для каждого вопроса.
-     * Для каждого варианта ответа генерируется поле ввода (radio или checkbox).
-     *
-     * @var string $inputType Тип поля ввода (radio или checkbox).
-     * @var string $inputName Имя поля для отправки данных.
+     * Перебираем все вопросы, загруженные из JSON.
+     * Каждый вопрос должен содержать текст и ответы, которые будут отображены пользователю.
      */
-    foreach ($q["answers"] as $key => $answer):
-        $inputType = $q["type"]; // Тип поля ввода (radio или checkbox)
-        $inputName = "answer[$index]"; // Имя поля для отправки данных
-        if ($inputType == 'checkbox') {
-            $inputName .= '[]';  // Для чекбоксов добавляем [] в имя
-        }
-?>
-    <input type="<?= $inputType ?>" name="<?= $inputName ?>" value="<?= $key ?>"> 
-    <?= $answer ?><br>
-<?php endforeach; ?>
-<br>
-<?php endforeach; ?>
+    foreach ($questions as $index => $q): 
+        // Пропускаем вопросы, у которых нет текста или ответов
+        if (empty($q["question"]) || empty($q["answers"])) continue;
+    ?>
+        <p><?php echo ($index + 1) . ". " .($q["question"]); ?></p>
+        
+        <?php 
+        /**
+         * Перебираем все ответы для текущего вопроса.
+         * В зависимости от типа ответа (radio или checkbox) создается соответствующий HTML-элемент.
+         */
+        foreach ($q["answers"] as $key => $answer): 
+            $inputType = $q["type"];  // Тип элемента (radio или checkbox)
+            $inputName = "answer[$index]"; // Имя для передачи данных в POST
 
-<button type="submit">Отправить</button>
+            /**
+             * Если тип ответа - checkbox, то добавляем [] в имя,
+             * чтобы можно было передавать массив выбранных значений.
+             */
+            if ($inputType == 'checkbox') {
+                $inputName .= '[]';  
+            }
+        ?>
+            <!-- Генерируем поле ввода для ответа -->
+            <input type="<?= $inputType ?>" name="<?= $inputName ?>" value="<?= $key ?>"> 
+            <?=($answer) ?><br>
+        <?php endforeach; ?>
+        <br>
+    <?php endforeach; ?>
+
+    <!-- Кнопка для отправки формы -->
+    <button type="submit">Отправить</button>
 </form>
+
 </body>
 </html>
