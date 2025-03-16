@@ -1,6 +1,4 @@
-`index.php`:
 
-```php
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -55,52 +53,26 @@
     <?php include 'index1.php'; ?>
 </body>
 </html>
-```
-<h3>Цикл for</h3>
-<?php
-    $a = 0;
-    $b = 0;
 
-    for ($i = 0; $i <= 5; $i++) {
-        $a += 10;
-        echo "a = $a, ";
-        $b += 5;
-        echo "b = $b<br>";
+<?php
+    // Получаем текущий день недели
+    $dayOfWeek = date('l');  // Функция date() с параметром 'l' возвращает полный день недели (например, 'Monday').
+
+    // Условие для John Styles
+    if ($dayOfWeek == 'Monday' || $dayOfWeek == 'Wednesday' || $dayOfWeek == 'Friday') {
+        // Если текущий день понедельник, среда или пятница, выводится график работы 8:00-12:00
+        echo '<tr><td>John Styles</td><td>8:00-12:00</td></tr>';
+    } else {
+        // В остальные дни недели выводится текст "Нерабочий день"
+        echo '<tr><td>John Styles</td><td>Нерабочий день</td></tr>';
     }
 
-    echo "End of the loop: a = $a, b = $b<br>";
-?>
-
-index1.php
-<h3>Цикл while</h3>
-```php
-<?php
-    $i = 0;
-    $a = 0;
-    $b = 0;
-
-    while ($i <= 5) {
-        $a += 10;
-        $b += 5;
-        echo "a = $a, b = $b<br>"; // Выводим промежуточные значения
-        $i++;
+    // Условие для Jane Doe
+    if ($dayOfWeek == 'Tuesday' || $dayOfWeek == 'Thursday' || $dayOfWeek == 'Saturday') {
+        // Если текущий день вторник, четверг или суббота, выводится график работы 12:00-16:00
+        echo '<tr><td>Jane Doe</td><td>12:00-16:00</td></tr>';
+    } else {
+        // В остальные дни недели выводится текст "Нерабочий день"
+        echo '<tr><td>Jane Doe</td><td>Нерабочий день</td></tr>';
     }
-    echo "End of the loop: a = $a, b = $b<br>";
 ?>
-
-<h3>Цикл do-while</h3>
-<?php
-    $i = 0;
-    $a = 0;
-    $b = 0;
-
-    do {
-        $a += 10;
-        $b += 5;
-        echo "a = $a, b = $b<br>"; // Выводим промежуточные значения
-        $i++;
-    } while ($i <= 5);
-
-    echo "End of the loop: a = $a, b = $b<br>";
-?>
-```
