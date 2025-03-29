@@ -9,6 +9,7 @@
 - **transactions.php** — содержит массив транзакций, а также функции для их обработки.
 - **gallery.php** — скрипт для вывода изображений в виде галереи.
 - **styles.css** — стили для таблицы и галереи изображений.
+- **transactions.json** - хранение данных
 
 ## Функционал
 
@@ -34,53 +35,157 @@
 
 Этот файл является основным и отвечает за отображение как таблицы с транзакциями, так и галереи изображений. В нем подключены другие необходимые файлы и стили.
 
-Для копирования кода используйте блоки с тройными обратными кавычками (```) вокруг кода:
-
 ```php
 <?php
+
 declare(strict_types=1);
-require 'transactions.php';
+require_once 'transactions.php';
+
+// Изначальная загрузка транзакций
+$transactions = loadTransactions();
+
+/**
+ * Обработка запросов от пользователя.
+ * В зависимости от типа запроса (POST) выполняются действия по добавлению, удалению, сортировке и поиску транзакций.
+ */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Добавление новой транзакции
+    if (isset($_POST['add'])) {
+        addTransaction(
+            count($transactions) + 1,  // ID транзакции
+            $_POST['date'],
+            (float)$_POST['amount'],
+            $_POST['description'],
+            $_POST['merchant']
+        );
+        $transactions = loadTransactions(); // Обновляем список транзакций
+    }
+
+    // Удаление транзакции
+    if (isset($_POST['remove'])) {
+        removeTransaction((int)$_POST['id']);
+        $transactions = loadTransactions(); // Обновляем список транзакций
+    }
+
+    // Сортировка по дате
+    if (isset($_POST['sort_date'])) {
+        sortTransactionsByDate();
+        $transactions = loadTransactions(); // Обновляем список транзакций после сортировки
+    }
+
+    // Сортировка по сумме
+    if (isset($_POST['sort_amount'])) {
+        sortTransactionsByAmount();
+        $transactions = loadTransactions(); // Обновляем список транзакций после сортировки
+    }
+
+    // Поиск по описанию
+    if (isset($_POST['search_description'])) {
+        if (!empty($_POST['description_search'])) {
+            $transactions = findTransactionByDescription($_POST['description_search']);
+        } else {
+            // Если поле поиска пустое, показываем все транзакции
+            $transactions = loadTransactions();
+        }
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Банковские транзакции</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css"> <!-- Подключение файла стилей -->
 </head>
+
 <body>
 
-<h2>Список транзакций</h2>
+<h1>Bank Transactions</h1>
+
+<!-- Форма добавления транзакции -->
+<h2>Add Transaction</h2>
+<form method="POST">
+    <label for="date">Date (YYYY-MM-DD): </label>
+    <input type="date" id="date" name="date" required><br><br>
+    
+    <label for="amount">Amount: </label>
+    <input type="number" id="amount" name="amount" step="0.01" required><br><br>
+    
+    <label for="description">Description: </label>
+    <input type="text" id="description" name="description" required><br><br>
+    
+    <label for="merchant">Merchant: </label>
+    <input type="text" id="merchant" name="merchant" required><br><br>
+    
+    <button type="submit" name="add">Add Transaction</button>
+</form>
+
+<!-- Форма удаления транзакции -->
+<h2>Remove Transaction</h2>
+<form method="POST">
+    <label for="id">Transaction ID: </label>
+    <input type="number" id="id" name="id" required><br><br>
+    <button type="submit" name="remove">Remove Transaction</button>
+</form>
+
+<!-- Форма сортировки транзакций -->
+<h2>Sort Transactions</h2>
+<form method="POST">
+    <button type="submit" name="sort_date">Sort by Date</button>
+    <button type="submit" name="sort_amount">Sort by Amount</button>
+</form>
+
+<!-- Форма поиска по описанию -->
+<h2>Search Transactions</h2>
+<form method="POST">
+    <label for="description_search">Search Description: </label>
+    <input type="text" id="description_search" name="description_search">
+    <button type="submit" name="search_description">Search</button>
+</form>
+
+<!-- Таблица транзакций -->
+<h2>Transaction List</h2>
 <table border="1">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Дата</th>
-            <th>Сумма</th>
-            <th>Описание</th>
-            <th>Магазин</th>
-            <th>Дней назад</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Description</th>
+            <th>Merchant</th>
+            <th>Days Since</th>
         </tr>
     </thead>
     <tbody>
         <?php foreach ($transactions as $transaction): ?>
-            <tr>
-                <td><?= $transaction['id'] ?></td>
-                <td><?= $transaction['date'] ?></td>
-                <td><?= $transaction['amount'] ?> $</td>
-                <td><?= $transaction['description'] ?></td>
-                <td><?= $transaction['merchant'] ?></td>
-                <td><?= daysSinceTransaction($transaction['date']) ?></td>
-            </tr>
+        <tr>
+            <td><?php echo $transaction['id']; ?></td>
+            <td><?php echo $transaction['date']; ?></td>
+            <td><?php echo $transaction['amount']; ?></td>
+            <td><?php echo $transaction['description']; ?></td>
+            <td><?php echo $transaction['merchant']; ?></td>
+            <td><?php echo daysSinceTransaction($transaction['date']); ?></td>
+        </tr>
         <?php endforeach; ?>
     </tbody>
 </table>
 
-<p><strong>Общая сумма всех транзакций: </strong><?= calculateTotalAmount($transactions) ?> $</p>
+<!-- Вывод общей суммы транзакций -->
+<p>Total Amount: <?php echo calculateTotalAmount($transactions); ?></p>
+
+</body>
+</html>
 
 <h2>Галерея изображений</h2>
+<div class="navbar">
+    <a href="#">Abouts casts</a>
+    <a href="#">News</a>
+    <a href="#">Contacts</a>
+</div>
+
 <?php require 'gallery.php'; ?>
 
 </body>
@@ -93,34 +198,42 @@ require 'transactions.php';
 
 ```php
 <?php
+
 declare(strict_types=1);
 
-/**
- * Массив транзакций, содержащий данные о каждой транзакции.
- * @var array
- */
-$transactions = [
-    [
-        "id" => 1,
-        "date" => "2019-01-01",
-        "amount" => 100.00,
-        "description" => "Payment for groceries",
-        "merchant" => "SuperMart",
-    ],
-    [
-        "id" => 2,
-        "date" => "2020-02-15",
-        "amount" => 75.50,
-        "description" => "Dinner with friends",
-        "merchant" => "Local Restaurant",
-    ],
-];
+// Путь к файлу с транзакциями
+define('TRANSACTIONS_FILE', 'transactions.json');
+
+// Проверка существования файла с транзакциями
+if (!file_exists(TRANSACTIONS_FILE)) {
+    // Если файла нет, создаем пустой массив и сохраняем его
+    file_put_contents(TRANSACTIONS_FILE, json_encode([]));
+}
 
 /**
- * Функция для вычисления общей суммы всех транзакций.
- *
+ * Загружает список транзакций из файла.
+ * 
+ * @return array Массив с данными транзакций.
+ */
+function loadTransactions(): array {
+    return json_decode(file_get_contents(TRANSACTIONS_FILE), true);
+}
+
+/**
+ * Сохраняет массив транзакций в файл.
+ * 
+ * @param array $transactions Массив транзакций для сохранения.
+ * @return void
+ */
+function saveTransactions(array $transactions): void {
+    file_put_contents(TRANSACTIONS_FILE, json_encode($transactions, JSON_PRETTY_PRINT));
+}
+
+/**
+ * Вычисляет общую сумму всех транзакций.
+ * 
  * @param array $transactions Массив транзакций.
- * @return float Общая сумма всех транзакций.
+ * @return float Общая сумма транзакций.
  */
 function calculateTotalAmount(array $transactions): float {
     $total = 0;
@@ -131,83 +244,110 @@ function calculateTotalAmount(array $transactions): float {
 }
 
 /**
- * Функция для поиска транзакций по части описания.
- *
- * @param array $transactions Массив транзакций.
- * @param string $descriptionPart Часть описания транзакции для поиска.
- * @return array Массив транзакций, описание которых содержит переданную строку.
+ * Находит транзакции по части описания.
+ * 
+ * @param string $descriptionPart Часть описания для поиска.
+ * @return array Массив транзакций, соответствующих описанию.
  */
-function findTransactionByDescription(array $transactions, string $descriptionPart): array {
-    return array_filter($transactions, function ($transaction) use ($descriptionPart) {
-        return stripos($transaction['description'], $descriptionPart) !== false;
+function findTransactionByDescription(string $descriptionPart): array {
+    $transactions = loadTransactions();
+    return array_filter($transactions, function($transaction) use ($descriptionPart) {
+        return strpos($transaction['description'], $descriptionPart) !== false;
     });
 }
 
 /**
- * Функция для поиска транзакции по ее ID.
- *
- * @param array $transactions Массив транзакций.
- * @param int $id ID транзакции для поиска.
- * @return array|null Транзакция с данным ID или null, если не найдена.
+ * Находит транзакцию по уникальному идентификатору.
+ * 
+ * @param int $id Идентификатор транзакции.
+ * @return array|null Транзакция с данным идентификатором или null, если не найдена.
  */
-function findTransactionById(array $transactions, int $id): ?array {
-    foreach ($transactions as $transaction) {
-        if ($transaction['id'] === $id) {
-            return $transaction;
-        }
-    }
-    return null;
+function findTransactionById(int $id): ?array {
+    $transactions = loadTransactions();
+    $filtered = array_filter($transactions, function($transaction) use ($id) {
+        return $transaction['id'] === $id;
+    });
+    return empty($filtered) ? null : reset($filtered); // Возвращаем первый элемент, если найден
 }
 
 /**
- * Функция для добавления новой транзакции.
- *
- * @param int $id ID транзакции.
+ * Добавляет новую транзакцию.
+ * 
+ * @param int $id Уникальный идентификатор транзакции.
  * @param string $date Дата транзакции.
  * @param float $amount Сумма транзакции.
  * @param string $description Описание транзакции.
- * @param string $merchant Магазин, где была совершена транзакция.
+ * @param string $merchant Название получателя платежа.
  * @return void
  */
 function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
-    global $transactions;
-    $transactions[] = compact("id", "date", "amount", "description", "merchant");
+    $transactions = loadTransactions();
+    $transactions[] = [
+        "id" => $id,
+        "date" => $date,
+        "amount" => $amount,
+        "description" => $description,
+        "merchant" => $merchant,
+    ];
+    saveTransactions($transactions);
 }
 
 /**
- * Функция для сортировки транзакций по дате.
- *
- * @param array $transactions Массив транзакций.
- * @return void Массив транзакций сортируется по дате.
+ * Удаляет транзакцию по идентификатору.
+ * 
+ * @param int $id Идентификатор транзакции для удаления.
+ * @return void
  */
-function sortTransactionsByDate(array &$transactions): void {
-    usort($transactions, fn($a, $b) => strcmp($a['date'], $b['date']));
+function removeTransaction(int $id): void {
+    $transactions = loadTransactions();
+    foreach ($transactions as $key => $transaction) {
+        if ($transaction['id'] === $id) {
+            unset($transactions[$key]);
+            break;
+        }
+    }
+    saveTransactions(array_values($transactions));
 }
 
 /**
- * Функция для сортировки транзакций по сумме (по убыванию).
- *
- * @param array $transactions Массив транзакций.
- * @return void Массив транзакций сортируется по сумме.
+ * Сортирует транзакции по дате в порядке возрастания.
+ * 
+ * @return void
  */
-function sortTransactionsByAmount(array &$transactions): void {
-    usort($transactions, fn($a, $b) => $b['amount'] <=> $a['amount']);
+function sortTransactionsByDate(): void {
+    $transactions = loadTransactions();
+    usort($transactions, function($a, $b) {
+        return strtotime($a['date']) - strtotime($b['date']);
+    });
+    saveTransactions($transactions);
 }
 
 /**
- * Функция для подсчета количества дней с момента транзакции.
- *
+ * Сортирует транзакции по сумме в порядке убывания.
+ * 
+ * @return void
+ */
+function sortTransactionsByAmount(): void {
+    $transactions = loadTransactions();
+    usort($transactions, function($a, $b) {
+        return $b['amount'] - $a['amount'];
+    });
+    saveTransactions($transactions);
+}
+
+/**
+ * Возвращает количество дней с момента транзакции.
+ * 
  * @param string $date Дата транзакции.
  * @return int Количество дней с момента транзакции.
  */
 function daysSinceTransaction(string $date): int {
-    $transactionDate = new DateTime($date);
-    $now = new DateTime();
-    return $now->diff($transactionDate)->days;
+    $transactionDate = strtotime($date);
+    $currentDate = time();
+    return floor(($currentDate - $transactionDate) / (60 * 60 * 24));
 }
+
 ?>
-
-
 
 ```
 
