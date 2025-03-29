@@ -29,26 +29,64 @@
 
 ```php
 <?php
-    // Получаем текущий день недели
-    $dayOfWeek = date('l');  // Функция date() с параметром 'l' возвращает полный день недели (например, 'Monday').
+// Устанавливаем московский часовой пояс
+date_default_timezone_set('Europe/Chisinau');
 
-    // Условие для John Styles
-    if ($dayOfWeek == 'Monday' || $dayOfWeek == 'Wednesday' || $dayOfWeek == 'Friday') {
-        // Если текущий день понедельник, среда или пятница, выводится график работы 8:00-12:00
-        echo '<tr><td>John Styles</td><td>8:00-12:00</td></tr>';
-    } else {
-        // В остальные дни недели выводится текст "Нерабочий день"
-        echo '<tr><td>John Styles</td><td>Нерабочий день</td></tr>';
-    }
+// Получаем текущий день недели в коротком формате (например: 'Mon', 'Tue')
+$dayOfWeek = date('D');
 
-    // Условие для Jane Doe
-    if ($dayOfWeek == 'Tuesday' || $dayOfWeek == 'Thursday' || $dayOfWeek == 'Saturday') {
-        // Если текущий день вторник, четверг или суббота, выводится график работы 12:00-16:00
-        echo '<tr><td>Jane Doe</td><td>12:00-16:00</td></tr>';
-    } else {
-        // В остальные дни недели выводится текст "Нерабочий день"
-        echo '<tr><td>Jane Doe</td><td>Нерабочий день</td></tr>';
-    }
+// Графики работы по дням недели
+$johnSchedule = (in_array($dayOfWeek, ['Mon', 'Wed', 'Fri'])) ? "8:00-12:00" : "Нерабочий день";
+$janeSchedule = (in_array($dayOfWeek, ['Tue', 'Thu', 'Sat'])) ? "12:00-16:00" : "Нерабочий день";
+?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание работы</title>
+    <style>
+        table {
+            width: 40%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 2px solid grey;
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Расписание работы</h2>
+    <p>Сегодня: <?php echo date('d.m.Y (l)'); ?></p>
+
+    <table>
+        <tr>
+            <th>№</th>
+            <th>Фамилия Имя</th>
+            <th>График работы</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>John Styles</td>
+            <td><?php echo $johnSchedule; ?></td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Jane Doe</td>
+            <td><?php echo $janeSchedule; ?></td>
+        </tr>
+    </table>
+
+    <h2>Результаты циклов</h2>
+    <?php include 'index1.php'; ?>
+
+</body>
+</html>
+
 ?>
 ```
 
@@ -57,48 +95,62 @@
 ```php
 <h3>Цикл for</h3>
 <?php
-    $a = 0;
-    $b = 0;
-// Цикл for выполняется от 0 до 5 включительно
-    for ($i = 0; $i <= 5; $i++) {
-// В каждом шаге цикла увеличиваем переменные $a и $b
-        $a += 10;
-        echo "a = $a, ";
-        $b += 5;
-        echo "b = $b<br>";
-    }
+$a = 0;
+$b = 0;
 
-    echo "End of the loop: a = $a, b = $b<br>";
+// Цикл for выполняется от 0 до 5 включительно
+for ($i = 0; $i <= 5; $i++) {
+    $a += 10;
+    $b += 5;
+
+    // Выводим промежуточные значения a и b на каждом шаге цикла
+    echo "Шаг $i: a = $a, b = $b<br>";
+}
+
+// Финальный результат после выполнения цикла
+echo "End of the loop: a = $a, b = $b<br>";
 ?>
 
 <h3>Цикл while</h3>
 <?php
-    $i = 0;
-    $a = 0;
-    $b = 0;
-// Цикл while выполняется, пока условие $i <= 5 истинно
-    while ($i <= 5) {
-        $a += 10;
-        $b += 5;
-        echo "a = $a, b = $b<br>"; // Выводим промежуточные значения
-        $i++;
-    }
-    echo "End of the loop: a = $a, b = $b<br>";
+$i = 0;
+$a = 0;
+$b = 0;
+
+// Цикл while выполняется, пока $i <= 5
+while ($i <= 5) {
+    $a += 10;
+    $b += 5;
+
+    // Выводим промежуточные значения a и b на каждом шаге цикла
+    echo "Шаг $i: a = $a, b = $b<br>";
+    
+    $i++;
+}
+
+// Финальный результат после выполнения цикла
+echo "End of the loop: a = $a, b = $b<br>";
 ?>
 
 <h3>Цикл do-while</h3>
 <?php
-    $i = 0;
-    $a = 0;
-    $b = 0;
- // Цикл do-while сначала выполняет тело цикла, а затем проверяет условие
-    do {
-        $a += 10;
-        $b += 5;
-        echo "a = $a, b = $b<br>"; // Выводим промежуточные значения
-        $i++;
-    } while ($i <= 5);
-   echo "End of the loop: a = $a, b = $b<br>";
+$i = 0;
+$a = 0;
+$b = 0;
+
+// Цикл do-while сначала выполняет тело цикла, а затем проверяет условие
+do {
+    $a += 10;
+    $b += 5;
+
+    // Выводим промежуточные значения a и b на каждом шаге цикла
+    echo "Шаг $i: a = $a, b = $b<br>";
+    
+    $i++;
+} while ($i <= 5);
+
+// Финальный результат после выполнения цикла
+echo "End of the loop: a = $a, b = $b<br>";
 ?>
 ```
 ### Контрольные вопросы
