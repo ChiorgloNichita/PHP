@@ -5,11 +5,11 @@
 Освоить работу с массивами в PHP, применяя различные операции: создание, добавление, удаление, сортировка и поиск. Закрепить навыки работы с функциями, включая передачу аргументов, возвращаемые значения и анонимные функции.
 Проект состоит из следующих файлов:
 
-- **index.php** — основная страница, которая отображает как транзакции, так и галерею изображений.
-- **transactions.php** — содержит массив транзакций, а также функции для их обработки.
-- **gallery.php** — скрипт для вывода изображений в виде галереи.
+- **index.php** —  страница, которая отображает галерею изображений.
+- **transactions.php** — содержит массив транзакций.
+- **main.php** — скрипт для вывода изображений в виде галереи.
 - **styles.css** — стили для таблицы и галереи изображений.
-- **transactions.json** - хранение данных
+- **functions.php** - содержит функции для их обработки
 
 ## Функционал
 
@@ -33,62 +33,204 @@
 
 #### index.php
 
-Этот файл является основным и отвечает за отображение как таблицы с транзакциями, так и галереи изображений. В нем подключены другие необходимые файлы и стили.
+Этот файл отвечает за отображение галереи изображений. В нем подключены другие необходимые файлы и стили.
+
+```php
+<?php
+/**
+ * Путь к директории с изображениями.
+ *
+ * @var string
+ */
+$dir = 'image/';
+
+/**
+ * Получение списка файлов из директории.
+ *
+ * Проверка, существует ли директория, и получение всех файлов, если директория существует. Если директория не найдена, создается пустой массив.
+ *
+ * @var array Массив файлов из директории.
+ */
+if (is_dir($dir)) {
+    $files = scandir($dir); // Получаем список файлов
+} else {
+    $files = []; // Если директория не найдена, создаем пустой массив
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cats</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <p>About Cats | News | Contacts</p>
+    </header>
+    <main>
+        <div class="gallery">
+            <?php
+            /**
+             * Проверка наличия изображений в директории и вывод изображений.
+             *
+             * Если в директории есть изображения (файлы), то выводятся изображения на страницу.
+             * Если папка пуста или не найдена, выводится сообщение "No images found".
+             */
+            if (!empty($files)) { // Проверка на наличие файлов
+                for ($i = 0; $i < count($files); $i++) {
+                    if ($files[$i] !== "." && $files[$i] !== ".." && preg_match('/\.(jpg|jpeg|png|gif)$/i', $files[$i])) {
+                        $path = $dir . $files[$i];
+            ?>
+            <div class="image">
+                <img src="<?php echo $path ?>" alt="Изображение">
+            </div>
+            <?php
+                    }
+                }
+            } else {
+                echo "<p>No images found.</p>"; // Сообщение, если папка пуста или не найдена
+            }
+            ?>
+        </div>
+    </main>
+    <footer>
+        <p>USM © 2025</p>
+    </footer>
+</body>
+</html>
+
+```
+
+#### functions.php
+
+Этот файл содержит  функции для обработки данных, включая добавление транзакций, сортировку и вычисление общей суммы.
 
 ```php
 <?php
 
 declare(strict_types=1);
-require_once 'transactions.php';
-
-// Изначальная загрузка транзакций
-$transactions = loadTransactions();
 
 /**
- * Обработка запросов от пользователя.
- * В зависимости от типа запроса (POST) выполняются действия по добавлению, удалению, сортировке и поиску транзакций.
+ * Вычисляет общую сумму всех транзакций.
+ *
+ * @param array $transactions Массив транзакций.
+ * @return float Общая сумма транзакций.
  */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Добавление новой транзакции
-    if (isset($_POST['add'])) {
-        addTransaction(
-            count($transactions) + 1,  // ID транзакции
-            $_POST['date'],
-            (float)$_POST['amount'],
-            $_POST['description'],
-            $_POST['merchant']
-        );
-        $transactions = loadTransactions(); // Обновляем список транзакций
+function calculateTotalAmount(array $transactions): float {
+    $total = 0;
+    foreach ($transactions as $transaction) {
+        $total += $transaction["amount"];
     }
+    return $total;
+}
 
-    // Удаление транзакции
-    if (isset($_POST['remove'])) {
-        removeTransaction((int)$_POST['id']);
-        $transactions = loadTransactions(); // Обновляем список транзакций
-    }
+/**
+ * Ищет транзакции по частичному совпадению в описании.
+ *
+ * @param array $transactions Массив транзакций.
+ * @param string $descriptionPart Часть описания, по которой производится поиск.
+ * @return array Найденные транзакции.
+ */
+function findTransactionByDescription(array $transactions, string $descriptionPart): array {
+    $foundTransactions = [];
 
-    // Сортировка по дате
-    if (isset($_POST['sort_date'])) {
-        sortTransactionsByDate();
-        $transactions = loadTransactions(); // Обновляем список транзакций после сортировки
-    }
-
-    // Сортировка по сумме
-    if (isset($_POST['sort_amount'])) {
-        sortTransactionsByAmount();
-        $transactions = loadTransactions(); // Обновляем список транзакций после сортировки
-    }
-
-    // Поиск по описанию
-    if (isset($_POST['search_description'])) {
-        if (!empty($_POST['description_search'])) {
-            $transactions = findTransactionByDescription($_POST['description_search']);
-        } else {
-            // Если поле поиска пустое, показываем все транзакции
-            $transactions = loadTransactions();
+    foreach ($transactions as $transaction) {
+        if (stripos($transaction["description"], $descriptionPart) !== false) {
+            $foundTransactions[] = $transaction;
         }
     }
+
+    return $foundTransactions;
 }
+
+/**
+ * Ищет транзакцию по её ID.
+ *
+ * @param array $transactions Массив транзакций.
+ * @param int $id ID транзакции.
+ * @return array|null Найденная транзакция или null, если не найдена.
+ */
+function findTransactionById(array $transactions, int $id): ?array {
+    foreach ($transactions as $transaction) {
+        if ($transaction["id"] === $id) {
+            return $transaction; // Если нашли, сразу возвращаем
+        }
+    }
+    return null; // Если не нашли, возвращаем null
+}
+
+/**
+ * Рассчитывает количество дней, прошедших с момента транзакции.
+ *
+ * @param DateTime $date Дата транзакции.
+ * @return int Количество прошедших дней.
+ */
+function daysSinceTransaction(DateTime $date): int {
+    $currentDate = new DateTime();
+    return $date->diff($currentDate)->days;
+}
+
+/**
+ * Добавляет новую транзакцию в глобальный массив транзакций.
+ *
+ * @param int $id ID транзакции.
+ * @param string $date Дата транзакции в формате "YYYY-MM-DD".
+ * @param float $amount Сумма транзакции.
+ * @param string $description Описание транзакции.
+ * @param string $merchant Продавец/компания.
+ * @return void
+ */
+function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
+    global $transactions;
+
+    $transactions[] = [
+        "id" => $id,
+        "date" => new DateTime($date),
+        "amount" => $amount,
+        "description" => $description,
+        "merchant" => $merchant,
+    ];
+}
+
+/**
+ * Сортирует транзакции по дате (от старых к новым).
+ *
+ * @param array $transactions Массив транзакций (передается по ссылке).
+ * @return void
+ */
+function sortTransactionsByDate(array &$transactions): void {
+    usort($transactions, function ($a, $b) {
+        return $a["date"] <=> $b["date"];
+    });
+}
+
+/**
+ * Сортирует транзакции по сумме (от больших к меньшим).
+ *
+ * @param array $transactions Массив транзакций (передается по ссылке).
+ * @return void
+ */
+function sortTransactionsByAmount(array &$transactions): void {
+    usort($transactions, function ($a, $b) {
+        return $b["amount"] <=> $a["amount"];
+    });
+}
+
+```
+
+#### main.php
+
+Этот код представляет собой веб-страницу, которая генерирует отчет о транзакциях.
+
+```php
+<?php
+
+declare(strict_types=1);
+require_once 'functions.php';
+require_once 'transactions.php';
 
 ?>
 
@@ -97,284 +239,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Банковские транзакции</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Подключение файла стилей -->
+    <title>Отчет о транзакциях</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-
-<h1>Bank Transactions</h1>
-
-<!-- Форма добавления транзакции -->
-<h2>Add Transaction</h2>
-<form method="POST">
-    <label for="date">Date (YYYY-MM-DD): </label>
-    <input type="date" id="date" name="date" required><br><br>
-    
-    <label for="amount">Amount: </label>
-    <input type="number" id="amount" name="amount" step="0.01" required><br><br>
-    
-    <label for="description">Description: </label>
-    <input type="text" id="description" name="description" required><br><br>
-    
-    <label for="merchant">Merchant: </label>
-    <input type="text" id="merchant" name="merchant" required><br><br>
-    
-    <button type="submit" name="add">Add Transaction</button>
-</form>
-
-<!-- Форма удаления транзакции -->
-<h2>Remove Transaction</h2>
-<form method="POST">
-    <label for="id">Transaction ID: </label>
-    <input type="number" id="id" name="id" required><br><br>
-    <button type="submit" name="remove">Remove Transaction</button>
-</form>
-
-<!-- Форма сортировки транзакций -->
-<h2>Sort Transactions</h2>
-<form method="POST">
-    <button type="submit" name="sort_date">Sort by Date</button>
-    <button type="submit" name="sort_amount">Sort by Amount</button>
-</form>
-
-<!-- Форма поиска по описанию -->
-<h2>Search Transactions</h2>
-<form method="POST">
-    <label for="description_search">Search Description: </label>
-    <input type="text" id="description_search" name="description_search">
-    <button type="submit" name="search_description">Search</button>
-</form>
-
-<!-- Таблица транзакций -->
-<h2>Transaction List</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Description</th>
-            <th>Merchant</th>
-            <th>Days Since</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($transactions as $transaction): ?>
-        <tr>
-            <td><?php echo $transaction['id']; ?></td>
-            <td><?php echo $transaction['date']; ?></td>
-            <td><?php echo $transaction['amount']; ?></td>
-            <td><?php echo $transaction['description']; ?></td>
-            <td><?php echo $transaction['merchant']; ?></td>
-            <td><?php echo daysSinceTransaction($transaction['date']); ?></td>
-        </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
-
-<!-- Вывод общей суммы транзакций -->
-<p>Total Amount: <?php echo calculateTotalAmount($transactions); ?></p>
-
+    <h2>Отчет о транзакциях</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Total Amount</th>
+                <th>Description</th>
+                <th>Merchant</th>
+                <th>Days Passed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($transactions as $transaction): ?>
+                <tr>
+                    <td><?php echo $transaction["id"]; ?></td>
+                    <td><?php echo $transaction["date"]->format('Y-m-d'); ?></td>
+                    <td><?php echo number_format($transaction["amount"], 2); ?> lei</td>
+                    <td><?php echo $transaction["description"]; ?></td>
+                    <td><?php echo $transaction["merchant"]; ?></td>
+                    <td><?php echo daysSinceTransaction($transaction["date"]); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <p>Total Amount: <?php echo number_format(calculateTotalAmount($transactions), 2); ?> lei</p>
 </body>
 </html>
 
-<h2>Галерея изображений</h2>
-<div class="navbar">
-    <a href="#">Abouts casts</a>
-    <a href="#">News</a>
-    <a href="#">Contacts</a>
-</div>
-
-<?php require 'gallery.php'; ?>
-
-</body>
-</html>
-```
-
-#### transactions.php
-
-Этот файл содержит массив с транзакциями и функции для обработки данных, включая добавление транзакций, сортировку и вычисление общей суммы.
-
-```php
-<?php
-
-declare(strict_types=1);
-
-// Путь к файлу с транзакциями
-define('TRANSACTIONS_FILE', 'transactions.json');
-
-// Проверка существования файла с транзакциями
-if (!file_exists(TRANSACTIONS_FILE)) {
-    // Если файла нет, создаем пустой массив и сохраняем его
-    file_put_contents(TRANSACTIONS_FILE, json_encode([]));
-}
-
-/**
- * Загружает список транзакций из файла.
- * 
- * @return array Массив с данными транзакций.
- */
-function loadTransactions(): array {
-    return json_decode(file_get_contents(TRANSACTIONS_FILE), true);
-}
-
-/**
- * Сохраняет массив транзакций в файл.
- * 
- * @param array $transactions Массив транзакций для сохранения.
- * @return void
- */
-function saveTransactions(array $transactions): void {
-    file_put_contents(TRANSACTIONS_FILE, json_encode($transactions, JSON_PRETTY_PRINT));
-}
-
-/**
- * Вычисляет общую сумму всех транзакций.
- * 
- * @param array $transactions Массив транзакций.
- * @return float Общая сумма транзакций.
- */
-function calculateTotalAmount(array $transactions): float {
-    $total = 0;
-    foreach ($transactions as $transaction) {
-        $total += $transaction['amount'];
-    }
-    return $total;
-}
-
-/**
- * Находит транзакции по части описания.
- * 
- * @param string $descriptionPart Часть описания для поиска.
- * @return array Массив транзакций, соответствующих описанию.
- */
-function findTransactionByDescription(string $descriptionPart): array {
-    $transactions = loadTransactions();
-    return array_filter($transactions, function($transaction) use ($descriptionPart) {
-        return strpos($transaction['description'], $descriptionPart) !== false;
-    });
-}
-
-/**
- * Находит транзакцию по уникальному идентификатору.
- * 
- * @param int $id Идентификатор транзакции.
- * @return array|null Транзакция с данным идентификатором или null, если не найдена.
- */
-function findTransactionById(int $id): ?array {
-    $transactions = loadTransactions();
-    $filtered = array_filter($transactions, function($transaction) use ($id) {
-        return $transaction['id'] === $id;
-    });
-    return empty($filtered) ? null : reset($filtered); // Возвращаем первый элемент, если найден
-}
-
-/**
- * Добавляет новую транзакцию.
- * 
- * @param int $id Уникальный идентификатор транзакции.
- * @param string $date Дата транзакции.
- * @param float $amount Сумма транзакции.
- * @param string $description Описание транзакции.
- * @param string $merchant Название получателя платежа.
- * @return void
- */
-function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
-    $transactions = loadTransactions();
-    $transactions[] = [
-        "id" => $id,
-        "date" => $date,
-        "amount" => $amount,
-        "description" => $description,
-        "merchant" => $merchant,
-    ];
-    saveTransactions($transactions);
-}
-
-/**
- * Удаляет транзакцию по идентификатору.
- * 
- * @param int $id Идентификатор транзакции для удаления.
- * @return void
- */
-function removeTransaction(int $id): void {
-    $transactions = loadTransactions();
-    foreach ($transactions as $key => $transaction) {
-        if ($transaction['id'] === $id) {
-            unset($transactions[$key]);
-            break;
-        }
-    }
-    saveTransactions(array_values($transactions));
-}
-
-/**
- * Сортирует транзакции по дате в порядке возрастания.
- * 
- * @return void
- */
-function sortTransactionsByDate(): void {
-    $transactions = loadTransactions();
-    usort($transactions, function($a, $b) {
-        return strtotime($a['date']) - strtotime($b['date']);
-    });
-    saveTransactions($transactions);
-}
-
-/**
- * Сортирует транзакции по сумме в порядке убывания.
- * 
- * @return void
- */
-function sortTransactionsByAmount(): void {
-    $transactions = loadTransactions();
-    usort($transactions, function($a, $b) {
-        return $b['amount'] - $a['amount'];
-    });
-    saveTransactions($transactions);
-}
-
-/**
- * Возвращает количество дней с момента транзакции.
- * 
- * @param string $date Дата транзакции.
- * @return int Количество дней с момента транзакции.
- */
-function daysSinceTransaction(string $date): int {
-    $transactionDate = strtotime($date);
-    $currentDate = time();
-    return floor(($currentDate - $transactionDate) / (60 * 60 * 24));
-}
-
-?>
-
-```
-
-#### gallery.php
-
-Этот файл сканирует директорию **image/** и выводит все изображения в виде галереи.
-
-```php
-<?php
-/**
- * Сканирует директорию и выводит изображения из папки.
- *
- * @var string $dir Путь к папке с изображениями.
- * @var array $files Массив файлов в директории.
- */
-$dir = 'image/';
-$files = scandir($dir);
-?>
-
-<div class="gallery">
-    <?php foreach ($files as $file): ?>
-        <?php if ($file !== "." && $file !== ".."): ?>
-            <img src="<?= $dir . $file ?>" alt="Image" class="gallery-img">
-        <?php endif; ?>
-    <?php endforeach; ?>
-</div>
-<p style="text-align:center; margin-top: 20px;">USM @ 2025</p>
 ```
 
 #### styles.css
@@ -382,63 +279,106 @@ $files = scandir($dir);
 Этот файл содержит стили для отображения таблицы и галереи изображений.
 
 ```css
-/* Стиль для навигационного меню */
-.navbar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background-color: #f0f0f0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 20px; 
-    margin-bottom: 20px; 
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
-.navbar a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    padding: 5px 15px;
-    transition: background-color 0.3s;
-}
-
-.navbar a:hover {
-    background-color: #ddd;
-    border-radius: 5px;
-}
-
-/* Стиль для таблицы транзакций */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid black;
+header {
+    background-color: #333;
+    color: #fff;
     text-align: center;
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
 }
 
 .gallery {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+    flex-wrap: wrap;  /* Размещение элементов по строкам */
+    justify-content: space-around;  /* Расстояние между изображениями */
+    margin: 20px;
+    gap: 15px;  /* Отступы между изображениями */
 }
 
-.gallery-img {
-    width: 150px;  
-    height: 150px; 
-    object-fit: cover; 
-    border: 2px solid #ddd;
-    border-radius: 5px;
+.image {
+    width: 200px;  /* Ширина каждого изображения */
+    height: auto;  /* Автоматическая высота, чтобы сохранить пропорции */
+    border-radius: 10px;  /* Скругленные углы для изображений */
+    overflow: hidden;  /* Обрезка лишнего контента */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Легкая тень для улучшения визуала */
+}
+
+.image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Обрезка изображений для покрытия всей области */
+    border-radius: 10px;
+}
+
+/* Дополнительный стиль для заголовков */
+h1 {
+    font-size: 2em;
+    margin: 0;
 }
 
 p {
-    font-size: 16px;
-    color: #333;
+    margin: 10px 0;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 20px;
     text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #d6e4ff;
+}
+
+p {
+    font-size: 18px;
+    font-weight: bold;
     margin-top: 20px;
 }
 

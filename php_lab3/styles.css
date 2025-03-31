@@ -1,61 +1,102 @@
-/* Стиль для навигационного меню */
-.navbar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    background-color: #f0f0f0;
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    background-color: #333;
+    color: #fff;
     padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 20px; /* Отступ сверху, чтобы не касалось таблицы */
-    margin-bottom: 20px; /* Отступ снизу для разделения с галереей */
 }
 
-.navbar a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    padding: 5px 15px;
-    transition: background-color 0.3s;
+.gallery {
+    display: flex;
+    flex-wrap: wrap;  /* Размещение элементов по строкам */
+    justify-content: space-around;  /* Расстояние между изображениями */
+    margin: 20px;
+    gap: 15px;  /* Отступы между изображениями */
 }
 
-.navbar a:hover {
-    background-color: #ddd;
-    border-radius: 5px;
+.image {
+    width: 200px;  /* Ширина каждого изображения */
+    height: auto;  /* Автоматическая высота, чтобы сохранить пропорции */
+    border-radius: 10px;  /* Скругленные углы для изображений */
+    overflow: hidden;  /* Обрезка лишнего контента */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  /* Легкая тень для улучшения визуала */
 }
 
-/* Стиль для таблицы транзакций */
-table {
+.image img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Обрезка изображений для покрытия всей области */
+    border-radius: 10px;
+}
+
+/* Дополнительный стиль для заголовков */
+h1 {
+    font-size: 2em;
+    margin: 0;
+}
+
+p {
+    margin: 10px 0;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 20px;
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+}
+
+table {
+    width: 80%;
+    margin: 20px auto;
     border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 th, td {
-    padding: 10px;
-    border: 1px solid black;
-    text-align: center;
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
 }
 
-/* Стиль для галереи изображений */
-.gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
 }
 
-.gallery-img {
-    width: 150px;  /* Фиксированный размер ширины */
-    height: 150px; /* Фиксированный размер высоты */
-    object-fit: cover; /* Изображения обрезаются, чтобы соответствовать размеру */
-    border: 2px solid #ddd;
-    border-radius: 5px;
+tr:nth-child(even) {
+    background-color: #f2f2f2;
 }
 
-/* Подвал */
+tr:hover {
+    background-color: #d6e4ff;
+}
+
 p {
-    font-size: 16px;
-    color: #333;
-    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
     margin-top: 20px;
 }
