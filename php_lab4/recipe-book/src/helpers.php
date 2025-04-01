@@ -15,4 +15,18 @@ function validateRecipeData($data) {
     // Добавьте другие проверки
     return $errors;
 }
+
+/**
+ * Загружает рецепты из JSON файла.
+ *
+ * @return array Массив рецептов.
+ */
+function loadRecipes() {
+    $file = __DIR__ . '/../storage/recipes.json';
+    if (!file_exists($file)) {
+        return [];
+    }
+    $content = file_get_contents($file);
+    return json_decode($content, true) ?? [];
+}
 ?>

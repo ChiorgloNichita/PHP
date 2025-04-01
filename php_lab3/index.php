@@ -15,6 +15,7 @@ $dir = 'image/';
  */
 if (is_dir($dir)) {
     $files = scandir($dir); // Получаем список файлов
+    $files = array_diff($files, ['.', '..']); // Убираем служебные элементы
 } else {
     $files = []; // Если директория не найдена, создаем пустой массив
 }
@@ -36,24 +37,14 @@ if (is_dir($dir)) {
         <div class="gallery">
             <?php
             /**
-             * Проверка наличия изображений в директории и вывод изображений.
-             *
-             * Если в директории есть изображения (файлы), то выводятся изображения на страницу.
-             * Если папка пуста или не найдена, выводится сообщение "No images found".
+             * Вывод всех файлов (без проверки типа).
              */
-            if (!empty($files)) { // Проверка на наличие файлов
-                for ($i = 0; $i < count($files); $i++) {
-                    if ($files[$i] !== "." && $files[$i] !== ".." && preg_match('/\.(jpg|jpeg|png|gif)$/i', $files[$i])) {
-                        $path = $dir . $files[$i];
-            ?>
-            <div class="image">
-                <img src="<?php echo $path ?>" alt="Изображение">
-            </div>
-            <?php
-                    }
+            if (!empty($files)) {
+                foreach ($files as $file) {
+                    echo "<div class='image'><img src='{$dir}{$file}' alt='Изображение'></div>";
                 }
             } else {
-                echo "<p>No images found.</p>"; // Сообщение, если папка пуста или не найдена
+                echo "<p>No images found.</p>";
             }
             ?>
         </div>

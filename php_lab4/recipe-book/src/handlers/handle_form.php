@@ -28,9 +28,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'steps' => explode("\n", $steps),
     ];
 
-    // Сохраняем данные в файл
-    $file = '../storage/recipes.txt';
-    file_put_contents($file, json_encode($formData) . PHP_EOL, FILE_APPEND);
+    // Сохраняем данные в JSON файл
+    $file = __DIR__ . '/../storage/recipes.json'; // Ensure the path is correct
+    $recipes = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    $recipes[] = $formData;
+
+    // Try saving the data and handle errors
+    if (file_put_contents($file, json_encode($recipes, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) === false) {
+        echo "Ошибка: не удалось сохранить данные в файл.";
+        exit;
+    }
 
     // Перенаправление на главную
     header("Location: ../public/index.php");

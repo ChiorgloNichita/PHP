@@ -53,6 +53,7 @@ $dir = 'image/';
  */
 if (is_dir($dir)) {
     $files = scandir($dir); // Получаем список файлов
+    $files = array_diff($files, ['.', '..']); // Убираем служебные элементы
 } else {
     $files = []; // Если директория не найдена, создаем пустой массив
 }
@@ -74,24 +75,14 @@ if (is_dir($dir)) {
         <div class="gallery">
             <?php
             /**
-             * Проверка наличия изображений в директории и вывод изображений.
-             *
-             * Если в директории есть изображения (файлы), то выводятся изображения на страницу.
-             * Если папка пуста или не найдена, выводится сообщение "No images found".
+             * Вывод всех файлов (без проверки типа).
              */
-            if (!empty($files)) { // Проверка на наличие файлов
-                for ($i = 0; $i < count($files); $i++) {
-                    if ($files[$i] !== "." && $files[$i] !== ".." && preg_match('/\.(jpg|jpeg|png|gif)$/i', $files[$i])) {
-                        $path = $dir . $files[$i];
-            ?>
-            <div class="image">
-                <img src="<?php echo $path ?>" alt="Изображение">
-            </div>
-            <?php
-                    }
+            if (!empty($files)) {
+                foreach ($files as $file) {
+                    echo "<div class='image'><img src='{$dir}{$file}' alt='Изображение'></div>";
                 }
             } else {
-                echo "<p>No images found.</p>"; // Сообщение, если папка пуста или не найдена
+                echo "<p>No images found.</p>";
             }
             ?>
         </div>
@@ -101,7 +92,6 @@ if (is_dir($dir)) {
     </footer>
 </body>
 </html>
-
 ```
 
 #### functions.php
@@ -114,81 +104,90 @@ if (is_dir($dir)) {
 declare(strict_types=1);
 
 /**
- * Вычисляет общую сумму всех транзакций.
+ * Функция для вычисления общей суммы всех транзакций.
+ *
+ * Проходит по массиву транзакций и суммирует значения поля 'amount' каждой транзакции.
  *
  * @param array $transactions Массив транзакций.
- * @return float Общая сумма транзакций.
+ * @return float Общая сумма всех транзакций.
  */
 function calculateTotalAmount(array $transactions): float {
-    $total = 0;
+    $total = 0.0;
     foreach ($transactions as $transaction) {
-        $total += $transaction["amount"];
+        $total += $transaction['amount'];
     }
     return $total;
 }
 
 /**
- * Ищет транзакции по частичному совпадению в описании.
+ * Функция для поиска транзакции по части описания.
  *
+ * Проходит по массиву транзакций и находит все транзакции, описание которых
+ * содержит указанную часть текста.
+ *
+ * @param string $descriptionPart Часть описания для поиска.
  * @param array $transactions Массив транзакций.
- * @param string $descriptionPart Часть описания, по которой производится поиск.
- * @return array Найденные транзакции.
+ * @return array Массив транзакций, чьи описания содержат заданную часть текста.
  */
-function findTransactionByDescription(array $transactions, string $descriptionPart): array {
-    $foundTransactions = [];
-
+function findTransactionByDescription(string $descriptionPart, array $transactions) {
+    $result = [];
     foreach ($transactions as $transaction) {
-        if (stripos($transaction["description"], $descriptionPart) !== false) {
-            $foundTransactions[] = $transaction;
+        if (strpos($transaction['description'], $descriptionPart) !== false) {
+            $result[] = $transaction;
         }
     }
-
-    return $foundTransactions;
+    return $result;
 }
 
 /**
- * Ищет транзакцию по её ID.
+ * Функция для поиска транзакции по ID.
  *
+ * Находит транзакцию в массиве по её уникальному ID.
+ *
+ * @param int $id Уникальный идентификатор транзакции.
  * @param array $transactions Массив транзакций.
- * @param int $id ID транзакции.
- * @return array|null Найденная транзакция или null, если не найдена.
+ * @return array|null Транзакция с заданным ID или null, если не найдена.
  */
-function findTransactionById(array $transactions, int $id): ?array {
+function findTransactionById(int $id, array $transactions) {
     foreach ($transactions as $transaction) {
-        if ($transaction["id"] === $id) {
-            return $transaction; // Если нашли, сразу возвращаем
+        if ($transaction['id'] === $id) {
+            return $transaction;
         }
     }
-    return null; // Если не нашли, возвращаем null
+    return null;
 }
 
 /**
- * Рассчитывает количество дней, прошедших с момента транзакции.
+ * Функция для вычисления количества дней с момента транзакции.
+ *
+ * Вычисляет разницу в днях между текущей датой и датой транзакции.
  *
  * @param DateTime $date Дата транзакции.
- * @return int Количество прошедших дней.
+ * @return int Количество дней между текущей датой и датой транзакции.
  */
 function daysSinceTransaction(DateTime $date): int {
     $currentDate = new DateTime();
-    return $date->diff($currentDate)->days;
+    $interval = $date->diff($currentDate);
+    return $interval->days;
 }
 
 /**
- * Добавляет новую транзакцию в глобальный массив транзакций.
+ * Функция для добавления новой транзакции.
  *
- * @param int $id ID транзакции.
- * @param string $date Дата транзакции в формате "YYYY-MM-DD".
+ * Добавляет новую транзакцию в массив транзакций.
+ *
+ * @param int $id Уникальный идентификатор транзакции.
+ * @param DateTime $date Дата транзакции.
  * @param float $amount Сумма транзакции.
  * @param string $description Описание транзакции.
- * @param string $merchant Продавец/компания.
+ * @param string $merchant Название организации получателя.
+ * @param array &$transactions Массив транзакций, в который добавляется новая транзакция.
  * @return void
  */
-function addTransaction(int $id, string $date, float $amount, string $description, string $merchant): void {
-    global $transactions;
-
+function addTransaction(int $id, DateTime $date, float $amount, string $description, string $merchant, array &$transactions): void {
     $transactions[] = [
         "id" => $id,
-        "date" => new DateTime($date),
+        "date" => $date,
         "amount" => $amount,
         "description" => $description,
         "merchant" => $merchant,
@@ -196,26 +195,30 @@ function addTransaction(int $id, string $date, float $amount, string $descriptio
 }
 
 /**
- * Сортирует транзакции по дате (от старых к новым).
+ * Функция для сортировки транзакций по дате.
  *
- * @param array $transactions Массив транзакций (передается по ссылке).
+ * Сортирует массив транзакций по дате в порядке возрастания.
+ *
+ * @param array &$transactions Массив транзакций, который будет отсортирован.
  * @return void
  */
 function sortTransactionsByDate(array &$transactions): void {
-    usort($transactions, function ($a, $b) {
-        return $a["date"] <=> $b["date"];
+    usort($transactions, function($a, $b) {
+        return $a['date'] <=> $b['date'];
     });
 }
 
 /**
- * Сортирует транзакции по сумме (от больших к меньшим).
+ * Функция для сортировки транзакций по сумме (по убыванию).
  *
- * @param array $transactions Массив транзакций (передается по ссылке).
+ * Сортирует массив транзакций по сумме в порядке убывания.
+ *
+ * @param array &$transactions Массив транзакций, который будет отсортирован.
  * @return void
  */
 function sortTransactionsByAmount(array &$transactions): void {
-    usort($transactions, function ($a, $b) {
-        return $b["amount"] <=> $a["amount"];
+    usort($transactions, function($a, $b) {
+        return $b['amount'] <=> $a['amount'];
     });
 }
 
@@ -229,9 +232,32 @@ function sortTransactionsByAmount(array &$transactions): void {
 <?php
 
 declare(strict_types=1);
-require_once 'functions.php';
-require_once 'transactions.php';
 
+// Подключаем необходимые файлы с функциями и транзакциями
+require_once 'functions.php';
+require_once 'transactions.php'; // Этот файл должен содержать массив $transactions
+
+/**
+ * Сортировка транзакций по дате.
+ *
+ * Использует функцию sortTransactionsByDate для сортировки массива транзакций
+ * по дате в порядке возрастания.
+ *
+ * @param array $transactions Массив транзакций, который нужно отсортировать.
+ * @return void
+ */
+sortTransactionsByDate($transactions);
+
+/**
+ * Сортировка транзакций по сумме (по убыванию).
+ *
+ * Использует функцию sortTransactionsByAmount для сортировки массива транзакций
+ * по сумме в порядке убывания.
+ *
+ * @param array $transactions Массив транзакций, который нужно отсортировать.
+ * @return void
+ */
+sortTransactionsByAmount($transactions);
 ?>
 
 <!DOCTYPE html>
@@ -271,6 +297,7 @@ require_once 'transactions.php';
     <p>Total Amount: <?php echo number_format(calculateTotalAmount($transactions), 2); ?> lei</p>
 </body>
 </html>
+
 
 ```
 

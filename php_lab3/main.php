@@ -1,9 +1,32 @@
 <?php
 
 declare(strict_types=1);
-require_once 'functions.php';
-require_once 'transactions.php';
 
+// Подключаем необходимые файлы с функциями и транзакциями
+require_once 'functions.php';
+require_once 'transactions.php'; // Этот файл должен содержать массив $transactions
+
+/**
+ * Сортировка транзакций по дате.
+ *
+ * Использует функцию sortTransactionsByDate для сортировки массива транзакций
+ * по дате в порядке возрастания.
+ *
+ * @param array $transactions Массив транзакций, который нужно отсортировать.
+ * @return void
+ */
+sortTransactionsByDate($transactions);
+
+/**
+ * Сортировка транзакций по сумме (по убыванию).
+ *
+ * Использует функцию sortTransactionsByAmount для сортировки массива транзакций
+ * по сумме в порядке убывания.
+ *
+ * @param array $transactions Массив транзакций, который нужно отсортировать.
+ * @return void
+ */
+sortTransactionsByAmount($transactions);
 ?>
 
 <!DOCTYPE html>

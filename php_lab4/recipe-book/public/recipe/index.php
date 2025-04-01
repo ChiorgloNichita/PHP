@@ -1,5 +1,5 @@
 <?php
-require_once '/../../src/helpers.php';
+require_once __DIR__ . '/../../src/helpers.php';
 
 $recipes = loadRecipes();
 
@@ -19,13 +19,12 @@ $totalPages = ceil($total / $perPage);
     <p><strong>Категория:</strong> <?= htmlspecialchars($recipe['category']) ?></p>
     <p><strong>Ингредиенты:</strong><br> <?= nl2br(htmlspecialchars($recipe['ingredients'])) ?></p>
     <p><strong>Описание:</strong><br> <?= nl2br(htmlspecialchars($recipe['description'])) ?></p>
-    <p><strong>Шаги:</strong>
-        <ul>
-            <?php foreach ($recipe['steps'] as $step): ?>
-                <li><?= htmlspecialchars($step) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    </p>
+    <p><strong>Шаги:</strong></p>
+    <ul>
+        <?php foreach ($recipe['steps'] as $step): ?>
+            <li><?= htmlspecialchars($step) ?></li>
+        <?php endforeach; ?>
+    </ul>
     <hr>
 <?php endforeach; ?>
 

@@ -1,5 +1,5 @@
 <?php
-require_once '/../src/helpers.php';
+require_once __DIR__ . '/../src/helpers.php';
 
 $recipes = loadRecipes();
 $latestRecipes = array_slice($recipes, -2);
