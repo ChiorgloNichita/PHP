@@ -6,43 +6,35 @@
 </head>
 <body>
     <h1>Добавление рецепта</h1>
-    <form action="/src/handlers/handler_form.php" method="POST">
-        <label>Название рецепта:<br>
-            <input type="text" name="title" required>
-        </label><br><br>
+    <form action="../../src/handlers/handle_form.php" method="post">
+        <label>Название:</label><br>
+        <input type="text" name="title" required><br><br>
 
-        <label>Категория:<br>
-            <select name="category" required>
-                <option value="">Выберите категорию</option>
-                <option>Завтрак</option>
-                <option>Обед</option>
-                <option>Ужин</option>
-                <option>Десерт</option>
-            </select>
-        </label><br><br>
+        <label>Категория:</label><br>
+        <select name="category" required>
+            <option value="">Выберите категорию</option>
+            <option value="Супы">Супы</option>
+            <option value="Салаты">Салаты</option>
+            <option value="Десерты">Десерты</option>
+        </select><br><br>
 
-        <label>Ингредиенты:<br>
-            <textarea name="ingredients" rows="4" required></textarea>
-        </label><br><br>
+        <label>Ингредиенты:</label><br>
+        <textarea name="ingredients" required></textarea><br><br>
 
-        <label>Описание:<br>
-            <textarea name="description" rows="4" required></textarea>
-        </label><br><br>
+        <label>Описание:</label><br>
+        <textarea name="description" required></textarea><br><br>
 
-        <label>Теги:<br>
-            <select name="tags[]" multiple>
-                <option>Просто</option>
-                <option>Быстро</option>
-                <option>Вегетарианское</option>
-                <option>Острое</option>
-            </select>
-        </label><br><br>
+        <label>Теги:</label><br>
+        <select name="tags[]" multiple>
+            <option value="быстро">быстро</option>
+            <option value="вкусно">вкусно</option>
+            <option value="полезно">полезно</option>
+        </select><br><br>
 
-        <label>Шаги приготовления:<br>
-            <textarea name="steps" rows="5"></textarea>
-        </label><br><br>
+        <label>Шаги приготовления:</label><br>
+        <textarea name="steps" required></textarea><br><br>
 
-        <button type="submit">Сохранить рецепт</button>
+        <button type="submit">Сохранить</button>
     </form>
 </body>
 </html>
