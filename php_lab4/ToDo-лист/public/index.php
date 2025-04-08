@@ -1,28 +1,40 @@
 <?php
-// Читаем задачи из файла
-$tasks = json_decode(file_get_contents('../storage/tasks.json'), true);
 
+/**
+ * Главная страница списка задач с постраничным выводом.
+ *
+ * Загружает задачи из файла, рассчитывает параметры пагинации
+ * и отображает таблицу с задачами (по 5 штук на страницу).
+ */
+
+// Читаем задачи из файла
+$tasks = json_decode(file_get_contents(__DIR__ . '/../storage/tasks.json'), true);
+
+// Проверяем наличие задач
 if (!$tasks) {
     die("Задачи не найдены.");
 }
 
-// Количество задач на одной странице
+// Количество задач, отображаемых на одной странице
 $tasksPerPage = 5;
 
-// Получаем текущую страницу из GET-параметра, если параметр не передан — используем первую страницу
+// Получаем номер текущей страницы из GET-параметра ?page=
+// Если параметр не указан — используется страница 1
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 
-// Проверяем, чтобы страница была не меньше 1
+// Убедимся, что номер страницы не меньше 1
 $page = $page < 1 ? 1 : $page;
 
-// Вычисляем общее количество страниц
+// Вычисляем общее количество задач
 $totalTasks = count($tasks);
+
+// Определяем количество страниц (округляем вверх)
 $totalPages = ceil($totalTasks / $tasksPerPage);
 
-// Вычисляем индекс для начала вывода задач на текущей странице
+// Вычисляем индекс начала вывода задач для текущей страницы
 $startIndex = ($page - 1) * $tasksPerPage;
 
-// Выбираем задачи для текущей страницы
+// Получаем список задач, которые нужно отобразить на текущей странице
 $currentPageTasks = array_slice($tasks, $startIndex, $tasksPerPage);
 ?>
 
@@ -36,6 +48,8 @@ $currentPageTasks = array_slice($tasks, $startIndex, $tasksPerPage);
 </head>
 <body>
     <h1>Список задач</h1>
+
+    <!-- Таблица со списком задач -->
     <table border="1">
         <tr>
             <th>Название</th>
@@ -43,12 +57,15 @@ $currentPageTasks = array_slice($tasks, $startIndex, $tasksPerPage);
             <th>Статус</th>
             <th>Действия</th>
         </tr>
+
+        <!-- Выводим задачи на текущей странице -->
         <?php foreach ($currentPageTasks as $task): ?>
             <tr>
                 <td><?php echo htmlspecialchars($task['title']); ?></td>
                 <td><?php echo htmlspecialchars($task['priority']); ?></td>
                 <td><?php echo htmlspecialchars($task['status']); ?></td>
                 <td>
+                    <!-- Ссылки на просмотр и редактирование задачи -->
                     <a href="task/view.php?id=<?php echo urlencode($task['title']); ?>">Просмотр</a>
                     <a href="task/edit.php?id=<?php echo urlencode($task['title']); ?>">Редактировать</a>
                 </td>
@@ -57,7 +74,8 @@ $currentPageTasks = array_slice($tasks, $startIndex, $tasksPerPage);
     </table>
 
     <br>
-    <!-- Навигация по страницам -->
+
+    <!-- Пагинация -->
     <div>
         <?php if ($page > 1): ?>
             <a href="/public/index.php?page=<?php echo $page - 1; ?>">Предыдущая</a>
@@ -71,6 +89,8 @@ $currentPageTasks = array_slice($tasks, $startIndex, $tasksPerPage);
     </div>
 
     <br>
-    <a href="task/create.php">Добавить задачу</a>
+
+    <!-- Кнопка добавления новой задачи -->
+    <a href="/task/create.php">Добавить задачу</a>
 </body>
 </html>
