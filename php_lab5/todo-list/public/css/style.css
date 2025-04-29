@@ -1,0 +1,96 @@
+/* Основной стиль для проекта: список задач (ToDo-лист). */
+/* Оформление таблицы, формы и кнопок. */
+
+/* Общие стили для страницы */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Заголовки */
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Таблица для отображения задач */
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+}
+
+/* Границы таблицы */
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+/* Стилизация ячеек таблицы */
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+/* Шапка таблицы */
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Кнопка действия */
+button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+}
+
+/* Эффект при наведении на кнопку */
+button:hover {
+    background-color: #45a049;
+}
+
+/* Стили формы (создание/редактирование задач) */
+form {
+    width: 60%;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Подписи к полям формы */
+form label {
+    font-size: 14px;
+    display: block;
+    margin: 5px 0;
+}
+
+/* Поля ввода, текстовые области и выпадающие списки */
+form input, form textarea, form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Кнопка в форме */
+form button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Эффект при наведении на кнопку формы */
+form button:hover {
+    background-color: #45a049;
+}
