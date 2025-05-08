@@ -1,7 +1,18 @@
 <?php
+/**
+ * Страница входа в систему.
+ *
+ * Принимает логин и пароль, проверяет пользователя, генерирует токен авторизации
+ * и сохраняет его в cookie и БД. Если вход успешен — перенаправляет на `about.php`.
+ *
+ * @package CourseManager
+ */
+
 require_once __DIR__ . '/db/education.php';
 
 $error = '';
+
+// Обработка формы входа
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $login = trim($_POST['login'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -9,21 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($login === '' || $password === '') {
         $error = 'Введите логин и пароль.';
     } else {
+        // Поиск пользователя
         $stmt = $authPdo->prepare("SELECT * FROM users WHERE login = ?");
         $stmt->execute([$login]);
         $user = $stmt->fetch();
 
+        // Проверка пароля
         if ($user && password_verify($password, $user['password'])) {
-            // Генерация уникального токена для пользователя
+            // Генерация токена
             $token = bin2hex(random_bytes(32));
-            setcookie('auth_token', $token, time() + 86400 * 7, '/'); // Токен сохраняется на 7 дней
+            setcookie('auth_token', $token, time() + 86400 * 7, '/'); // 7 дней
 
-            // Сохраняем токен в базе данных для пользователя
+            // Сохранение токена в базе
             $stmt = $authPdo->prepare("UPDATE users SET token = ? WHERE id = ?");
             $stmt->execute([$token, $user['id']]);
 
-            // Перенаправляем на главную страницу
-            header('Location: index.php');
+            // Редирект
+            header('Location: pages/about.php');
             exit;
         } else {
             $error = 'Неверный логин или пароль.';
@@ -31,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -40,10 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body class="bg-light d-flex justify-content-center align-items-center vh-100">
 <div class="card p-4 shadow" style="max-width:400px; width:100%;">
-  <h4 class="mb-3">Вход в систему</h4>
+  <h4 class="mb-3">🔐 Вход в систему</h4>
+
   <?php if ($error): ?>
-    <div class="alert alert-danger"><?= $error ?></div>
+    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
   <?php endif; ?>
+
   <form method="post">
     <div class="mb-3">
       <label class="form-label">Логин</label>

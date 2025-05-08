@@ -1,12 +1,24 @@
-<?php require_once __DIR__ . "/includes/auth.php"; ?>
-<?php require_once __DIR__ . "/templates/header.php"; ?>
-<?php require_once __DIR__ . "/db/education.php";
+<?php
+/**
+ * Главная страница — отображение и добавление курсов.
+ *
+ * Доступна авторизованным пользователям. Отображает список курсов, кнопки перехода к студентам и редактированию курса,
+ * а также форму добавления нового курса.
+ *
+ * @package CourseManager
+ */
 
+require_once __DIR__ . "/includes/auth.php";
+require_once __DIR__ . "/templates/header.php";
+require_once __DIR__ . "/db/education.php";
+
+// Получение всех курсов
 $courses = $eduPdo->query("SELECT * FROM courses ORDER BY id DESC")->fetchAll();
 ?>
 
-<h1 class="mb-4">Список курсов</h1>
+<h1 class="mb-4">📚 Список курсов</h1>
 
+<!-- Карточки курсов -->
 <div class="row row-cols-1 row-cols-md-2 g-4">
     <?php foreach ($courses as $index => $c): ?>
         <div class="col">
@@ -25,7 +37,8 @@ $courses = $eduPdo->query("SELECT * FROM courses ORDER BY id DESC")->fetchAll();
     <?php endforeach; ?>
 </div>
 
-<h2 class="mt-5">Добавить курс</h2>
+<!-- Форма добавления курса -->
+<h2 class="mt-5">➕ Добавить курс</h2>
 <form method="post" action="actions/add_course.php">
     <div class="mb-3">
         <label class="form-label">Название</label>
@@ -33,7 +46,7 @@ $courses = $eduPdo->query("SELECT * FROM courses ORDER BY id DESC")->fetchAll();
     </div>
     <div class="mb-3">
         <label class="form-label">Описание</label>
-        <textarea name="description" class="form-control"></textarea>
+        <textarea name="description" class="form-control" rows="3"></textarea>
     </div>
     <button class="btn btn-primary">Добавить</button>
 </form>

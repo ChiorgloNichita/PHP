@@ -1,16 +1,35 @@
 <?php
+/**
+ * Страница отображения студентов, записанных на выбранный курс.
+ *
+ * Получает ID курса через GET, извлекает название курса и список студентов,
+ * записанных на него, через таблицу `enrollments`.
+ * 
+ * Доступна авторизованным пользователям.
+ *
+ * @package CourseManager
+ */
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../db/education.php';
 require_once __DIR__ . '/../templates/header.php';
 
+// Получение ID курса из URL
 $id = $_GET['id'] ?? null;
-if (!$id) die("ID курса не передан");
+if (!$id) {
+    die("❌ ID курса не передан");
+}
 
-$course = $eduPdo->prepare("SELECT * FROM courses WHERE id = ?");
-$course->execute([$id]);
-$courseData = $course->fetch();
-if (!$courseData) die("Курс не найден");
+// Получение информации о курсе
+$courseStmt = $eduPdo->prepare("SELECT * FROM courses WHERE id = ?");
+$courseStmt->execute([$id]);
+$courseData = $courseStmt->fetch();
 
+if (!$courseData) {
+    die("❌ Курс не найден");
+}
+
+// Получение студентов, записанных на курс
 $stmt = $eduPdo->prepare("
     SELECT s.* FROM students s
     JOIN enrollments e ON s.id = e.student_id
@@ -31,10 +50,10 @@ $students = $stmt->fetchAll();
       </tr>
     </thead>
     <tbody>
-      <?php foreach ($students as $s): ?>
+      <?php foreach ($students as $student): ?>
         <tr>
-          <td><?= htmlspecialchars($s['name']) ?></td>
-          <td><?= htmlspecialchars($s['email']) ?></td>
+          <td><?= htmlspecialchars($student['name']) ?></td>
+          <td><?= htmlspecialchars($student['email']) ?></td>
         </tr>
       <?php endforeach; ?>
     </tbody>
@@ -44,6 +63,5 @@ $students = $stmt->fetchAll();
 <?php endif; ?>
 
 <a href="../index.php" class="btn btn-secondary">← Назад к курсам</a>
-
 
 <?php require_once __DIR__ . '/../templates/footer.php'; ?>

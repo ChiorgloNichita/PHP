@@ -1,14 +1,24 @@
-<?php require_once __DIR__ . '/../includes/auth.php'; ?>
 <?php
+/**
+ * Страница управления записями студентов на курсы.
+ *
+ * Позволяет администратору:
+ * - записывать студента на курс;
+ * - удалять запись о курсе;
+ * - искать по имени студента.
+ *
+ * @package CourseManager
+ */
+
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../templates/header.php';
 require_once __DIR__ . '/../db/education.php';
 require_once __DIR__ . '/../includes/log_action.php';
 
-// Обработка удаления записи
+// === Удаление записи ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
-    // Проверка, является ли пользователь администратором
-    if (!isAdmin()) {  
-        die("У вас нет прав для удаления записи.");
+    if (!isAdmin()) {
+        die("⛔ У вас нет прав для удаления записи.");
     }
 
     $student_id = (int)($_POST['student_id'] ?? 0);
@@ -17,17 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
     if ($student_id && $course_id) {
         $stmt = $eduPdo->prepare("DELETE FROM enrollments WHERE student_id = ? AND course_id = ?");
         $stmt->execute([$student_id, $course_id]);
-        logAction("Удалена запись студента #$student_id с курса #$course_id");
+        logAction("Удалена запись: студент #$student_id снят с курса #$course_id");
         header("Location: enroll.php");
         exit;
     }
 }
 
-// Обработка добавления записи
+// === Добавление записи ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll'])) {
-    // Проверка, является ли пользователь администратором
-    if (!isAdmin()) {  
-        die("У вас нет прав для добавления записи.");
+    if (!isAdmin()) {
+        die("⛔ У вас нет прав для добавления записи.");
     }
 
     $student_id = (int)($_POST['student_id'] ?? 0);
@@ -42,12 +51,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enroll'])) {
     }
 }
 
-// Получение всех студентов и курсов
-$students = $eduPdo->query("SELECT * FROM students")->fetchAll();
-$courses = $eduPdo->query("SELECT * FROM courses")->fetchAll();
+// === Получение студентов ===
+$stmtStudents = $eduPdo->prepare("SELECT * FROM students");
+$stmtStudents->execute();
+$students = $stmtStudents->fetchAll();
 
-// Фильтр по имени студента
+// === Получение курсов ===
+$stmtCourses = $eduPdo->prepare("SELECT * FROM courses");
+$stmtCourses->execute();
+$courses = $stmtCourses->fetchAll();
+
+// === Получение записей с фильтром по имени ===
 $search = trim($_GET['search'] ?? '');
+
 $query = "
     SELECT e.student_id, e.course_id, s.name AS student, c.title AS course
     FROM enrollments e
@@ -57,15 +73,20 @@ $query = "
 
 if ($search !== '') {
     $stmt = $eduPdo->prepare($query . " WHERE s.name LIKE ?");
-    $stmt->execute(['%' . $search . '%']);
+    $stmt->execute(["%" . $search . "%"]);
     $enrollments = $stmt->fetchAll();
 } else {
-    $enrollments = $eduPdo->query($query)->fetchAll();
+    $stmtAll = $eduPdo->prepare($query);
+    $stmtAll->execute();
+    $enrollments = $stmtAll->fetchAll();
 }
 ?>
 
-<h1 class="mb-4">Записать студента на курс</h1>
+<!-- === Интерфейс === -->
 
+<h1 class="mb-4">📘 Записать студента на курс</h1>
+
+<!-- Форма записи -->
 <form method="post" class="row g-3 mb-4">
     <div class="col-md-5">
         <label class="form-label">Студент</label>
@@ -90,17 +111,23 @@ if ($search !== '') {
     </div>
 </form>
 
-<h2 class="mb-3">Записи</h2>
-
+<!-- Форма поиска -->
+<h2 class="mb-3">🎓 Записи</h2>
 <form method="get" class="mb-3 d-flex gap-2">
     <input type="text" name="search" class="form-control" placeholder="Поиск по имени студента" value="<?= htmlspecialchars($search) ?>">
     <button type="submit" class="btn btn-secondary">Найти</button>
-    <a href="pages/enroll.php" class="btn btn-outline-secondary">Сброс</a>
-    <a href="pages/enroll.php?export=csv" class="btn btn-success">Экспорт в CSV</a>
+    <a href="enroll.php" class="btn btn-outline-secondary">Сброс</a>
 </form>
 
+<!-- Таблица записей -->
 <table class="table table-bordered">
-    <thead><tr><th>Студент</th><th>Курс</th><th>Действие</th></tr></thead>
+    <thead>
+        <tr>
+            <th>Студент</th>
+            <th>Курс</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
     <tbody>
         <?php foreach ($enrollments as $e): ?>
             <tr>
@@ -108,14 +135,13 @@ if ($search !== '') {
                 <td><?= htmlspecialchars($e['course']) ?></td>
                 <td>
                     <?php if (isAdmin()): ?>
-                        <!-- Удаление доступно только администратору -->
                         <form method="post" style="display:inline;">
                             <input type="hidden" name="student_id" value="<?= $e['student_id'] ?>">
                             <input type="hidden" name="course_id" value="<?= $e['course_id'] ?>">
                             <button type="submit" name="delete" class="btn btn-sm btn-danger">Удалить</button>
                         </form>
                     <?php else: ?>
-                        <span class="text-muted">Удаление недоступно</span>
+                        <span class="text-muted">Недоступно</span>
                     <?php endif; ?>
                 </td>
             </tr>

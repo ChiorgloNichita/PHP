@@ -1,9 +1,21 @@
 <?php
-// Основная БД для курсов
+/**
+ * Подключение к основной базе данных для курсов.
+ * 
+ * В этом блоке создаётся подключение к базе данных "education", где хранятся данные о курсах.
+ * Используется PDO для работы с MySQL базой данных. Устанавливается кодировка UTF-8 для корректной работы с текстовыми данными.
+ * Также включается режим обработки ошибок с исключениями для удобного отлова ошибок.
+ */
 $eduPdo = new PDO("mysql:host=localhost;dbname=education;charset=utf8", "root", "");
-$eduPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$eduPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);  // Включаем выброс исключений при ошибках
 
-// Вторая БД — для авторизации и логов
+/**
+ * Подключение ко второй базе данных для авторизации и логирования.
+ * 
+ * Этот блок создаёт подключение к базе данных "logs", в которой хранятся данные о пользователях и логах.
+ * Для работы с базой данных используется PDO с кодировкой UTF-8. Также включён режим исключений.
+ */
 $authPdo = new PDO("mysql:host=localhost;dbname=logs;charset=utf8", "root", "");
-$authPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$authPdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);  // Включаем выброс исключений при ошибках
+
 ?>
